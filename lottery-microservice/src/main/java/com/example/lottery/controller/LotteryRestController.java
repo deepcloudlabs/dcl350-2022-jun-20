@@ -16,6 +16,8 @@ import org.springframework.web.context.annotation.RequestScope;
 
 import com.example.lottery.service.LotteryService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 @RequestScope
 @RequestMapping("/numbers")
@@ -32,6 +34,7 @@ public class LotteryRestController {
 	}
 	
 	@GetMapping(params="column")
+	@SecurityRequirement(name="Bearer Authentication")
 	public List<List<Integer>> getLotteryNumbers(@RequestParam @Min(3) @Max(20) int column){
 		System.out.println("New request has arrived at %d".formatted(port));
 		return lotteryService.getLotteryNumbers(column);

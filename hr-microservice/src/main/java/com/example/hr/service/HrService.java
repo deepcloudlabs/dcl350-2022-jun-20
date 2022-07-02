@@ -15,6 +15,9 @@ import com.example.hr.dto.response.FireEmployeeResponse;
 import com.example.hr.dto.response.HireEmployeeResponse;
 import com.example.hr.dto.response.UpdateEmployeeSalaryResponse;
 
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead.Type;
+
 @Service
 public class HrService {
 	private HrApplication hrApplication;
@@ -41,6 +44,7 @@ public class HrService {
 		return new FireEmployeeResponse("success");
 	}
 
+	//@Bulkhead(name = "find",type = Type.SEMAPHORE)
 	public EmployeeResponse findEmployee(String identity) {
 		TcKimlikNo kimlik = TcKimlikNo.valueOf(identity);
 		return hrApplication.getEmployeeInformation(kimlik).map(emp -> modelMapper.map(emp, EmployeeResponse.class))
@@ -49,6 +53,7 @@ public class HrService {
 	}
 
 	@Transactional
+	@Bulkhead(name = "update",type = Type.SEMAPHORE)
 	public UpdateEmployeeSalaryResponse updateEmployeeSalary(String identity, UpdateEmployeeSalaryRequest request) {
 		TcKimlikNo kimlik = TcKimlikNo.valueOf(identity);
 		var employee = hrApplication.updateSalary(kimlik, request.getRate());
